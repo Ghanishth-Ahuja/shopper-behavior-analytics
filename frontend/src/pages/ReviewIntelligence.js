@@ -91,7 +91,15 @@ const ReviewIntelligence = () => {
 
   // Calculate sentiment metrics
   const sentimentMetrics = React.useMemo(() => {
-    if (!sentimentData) return {};
+    if (!sentimentData) return {
+      total: 0,
+      positive: 0,
+      negative: 0,
+      neutral: 0,
+      positivePercentage: 0,
+      negativePercentage: 0,
+      avgRating: 0,
+    };
 
     const total = sentimentData.total_reviews || 0;
     const positive = sentimentData.sentiment_distribution?.positive || 0;

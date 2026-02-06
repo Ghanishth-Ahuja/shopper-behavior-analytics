@@ -105,7 +105,12 @@ const SegmentExplorer = () => {
 
   // Calculate segment statistics
   const segmentStats = React.useMemo(() => {
-    if (!filteredSegments) return {};
+    if (!filteredSegments) return {
+      totalUsers: 0,
+      avgLTV: 0,
+      avgConversion: 0,
+      totalSegments: 0,
+    };
 
     const totalUsers = filteredSegments.reduce((sum, seg) => sum + seg.size, 0);
     const avgLTV = filteredSegments.reduce((sum, seg) => sum + (seg.insights?.avg_order_value || 0), 0) / filteredSegments.length;
