@@ -6,9 +6,11 @@ import {
   CardContent,
 } from '@mui/material';
 import {
-  FunnelPlot,
-  Label,
+  FunnelChart,
+  Funnel,
+  LabelList,
   ResponsiveContainer,
+  Tooltip,
 } from 'recharts';
 
 const ConversionFunnelChart = ({ data }) => {
@@ -32,56 +34,59 @@ const ConversionFunnelChart = ({ data }) => {
   return (
     <Box sx={{ width: '100%', height: 300 }}>
       <ResponsiveContainer>
-        <FunnelPlot
-          data={chartData}
-          layout="horizontal"
-          dataKey="value"
-          isAnimationActive={true}
-          labelLine={false}
-          label={(props) => {
-            const { x, y, width, height } = props;
-            const index = chartData.findIndex(item => item.stage === props.payload.stage);
-            const rate = conversionRates[index - 1];
-            
-            return (
-              <g>
-                <text
-                  x={x + width / 2}
-                  y={y + height / 2}
-                  fill="#fff"
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize={12}
-                  fontWeight={500}
-                >
-                  {props.payload.stage}
-                </text>
-                <text
-                  x={x + width / 2}
-                  y={y + height / 2 + 15}
-                  fill="#fff"
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize={10}
-                >
-                  {props.payload.value.toLocaleString()}
-                </text>
-                {rate && (
+        <FunnelChart>
+          <Tooltip />
+          <Funnel
+            data={chartData}
+            dataKey="value"
+            nameKey="stage"
+            isAnimationActive={true}
+            labelLine={false}
+            label={(props) => {
+              const { x, y, width, height } = props;
+              const index = chartData.findIndex(item => item.stage === props.payload.stage);
+              const rate = conversionRates[index - 1];
+              
+              return (
+                <g>
                   <text
                     x={x + width / 2}
-                    y={y + height / 2 + 30}
+                    y={y + height / 2}
+                    fill="#fff"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={12}
+                    fontWeight={500}
+                  >
+                    {props.payload.stage}
+                  </text>
+                  <text
+                    x={x + width / 2}
+                    y={y + height / 2 + 15}
                     fill="#fff"
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fontSize={10}
                   >
-                    {rate}% conv
+                    {props.payload.value.toLocaleString()}
                   </text>
-                )}
-              </g>
-            );
-          }}
-        />
+                  {rate && (
+                    <text
+                      x={x + width / 2}
+                      y={y + height / 2 + 30}
+                      fill="#fff"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fontSize={10}
+                    >
+                      {rate}% conv
+                    </text>
+                  )}
+                </g>
+              );
+            }}
+          />
+        </FunnelChart>
       </ResponsiveContainer>
     </Box>
   );

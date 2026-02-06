@@ -117,7 +117,12 @@ const RecommendationIntelligence = () => {
 
   // Calculate key metrics
   const keyMetrics = React.useMemo(() => {
-    if (!performanceMetrics) return {};
+    if (!performanceMetrics) return {
+      totalRecommendations: 0,
+      clickRate: 0,
+      conversionRate: 0,
+      avgPosition: 0,
+    };
 
     return {
       totalRecommendations: performanceMetrics.total_recommendations || 0,

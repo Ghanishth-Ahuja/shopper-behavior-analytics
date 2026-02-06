@@ -4,10 +4,12 @@ import {
   CardContent,
   Typography,
   Box,
+} from '@mui/material';
+import {
   TrendingUp,
   TrendingDown,
   TrendingFlat,
-} from '@mui/material';
+} from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
 const MetricCard = ({ 
