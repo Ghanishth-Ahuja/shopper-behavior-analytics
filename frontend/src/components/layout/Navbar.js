@@ -10,7 +10,9 @@ import {
   MenuItem,
   Badge,
   Tooltip,
+  Divider,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import {
   Menu as MenuIcon,
   Notifications,
@@ -22,6 +24,7 @@ import {
 import { useApp } from '../../context/AppContext';
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const { sidebarOpen, toggleSidebar, theme, setTheme } = useApp();
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
@@ -133,20 +136,28 @@ const Navbar = () => {
             onClose={handleProfileMenuClose}
             PaperProps={{
               elevation: 3,
-              sx: { mt: 2 },
+              sx: { mt: 2, minWidth: 200 },
             }}
           >
-            <MenuItem onClick={handleProfileMenuClose}>
+            <MenuItem onClick={() => { handleProfileMenuClose(); navigate('/profile'); }}>
               <Avatar sx={{ width: 24, height: 24, mr: 2 }} />
               Profile
             </MenuItem>
-            <MenuItem onClick={handleThemeToggle}>
+            <MenuItem onClick={() => { handleProfileMenuClose(); navigate('/settings'); }}>
               <Settings sx={{ mr: 2 }} />
-              Toggle Theme ({theme === 'light' ? '🌙' : '☀️'})
+              Settings
             </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleThemeToggle}>
+              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <Box sx={{ flexGrow: 1 }}>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</Box>
+                {theme === 'light' ? '🌙' : '☀️'}
+              </Box>
+            </MenuItem>
+            <Divider />
             <MenuItem onClick={handleProfileMenuClose}>
-              <Logout sx={{ mr: 2 }} />
-              Logout
+              <Logout sx={{ mr: 2 }} color="error" />
+              <Typography color="error">Logout</Typography>
             </MenuItem>
           </Menu>
         </Box>

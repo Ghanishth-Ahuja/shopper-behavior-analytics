@@ -22,6 +22,7 @@ import {
   PersonSearch,
   Analytics,
   Settings,
+  CloudUpload,
 } from '@mui/icons-material';
 import { useApp } from '../../context/AppContext';
 
@@ -32,7 +33,7 @@ const menuItems = [
   { text: 'Recommendations', icon: <TrendingUp />, path: '/recommendations' },
   { text: 'Review Intelligence', icon: <RateReview />, path: '/reviews' },
   { text: 'User Explorer', icon: <PersonSearch />, path: '/users' },
-  { text: 'Analytics', icon: <Analytics />, path: '/analytics' },
+  { text: 'Data Management', icon: <CloudUpload />, path: '/data' },
 ];
 
 const Sidebar = () => {
@@ -126,7 +127,7 @@ const Sidebar = () => {
         </Typography>
         <List dense>
           <ListItem disablePadding>
-            <ListItemButton sx={{ borderRadius: 1 }}>
+            <ListItemButton sx={{ borderRadius: 1 }} onClick={() => handleNavigation('/segments')}>
               <ListItemIcon sx={{ minWidth: 32 }}>
                 <Psychology fontSize="small" />
               </ListItemIcon>
@@ -137,7 +138,7 @@ const Sidebar = () => {
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton sx={{ borderRadius: 1 }}>
+            <ListItemButton sx={{ borderRadius: 1 }} onClick={() => handleNavigation('/settings')}>
               <ListItemIcon sx={{ minWidth: 32 }}>
                 <Settings fontSize="small" />
               </ListItemIcon>

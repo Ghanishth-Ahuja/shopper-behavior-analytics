@@ -10,10 +10,69 @@ import ProductAffinity from './pages/ProductAffinity';
 import RecommendationIntelligence from './pages/RecommendationIntelligence';
 import ReviewIntelligence from './pages/ReviewIntelligence';
 import UserExplorer from './pages/UserExplorer';
-import { AppProvider } from './context/AppContext';
+import DataManagement from './pages/DataManagement';
+import Settings from './pages/Settings';
+import Profile from './pages/Profile';
+import { AppProvider, useApp } from './context/AppContext';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+function ThemeWrapper({ children }) {
+  const { theme: currentTheme } = useApp();
+  
+  const muiTheme = React.useMemo(() => createTheme({
+    palette: {
+      mode: currentTheme || 'light',
+      primary: {
+        main: '#1976d2',
+        light: '#42a5f5',
+        dark: '#1565c0',
+      },
+      secondary: {
+        main: '#dc004e',
+      },
+      background: {
+        default: currentTheme === 'dark' ? '#121212' : '#f5f5f5',
+        paper: currentTheme === 'dark' ? '#1e1e1e' : '#ffffff',
+      },
+    },
+    typography: {
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      h4: { fontWeight: 600 },
+      h5: { fontWeight: 600 },
+      h6: { fontWeight: 600 },
+    },
+    shape: {
+      borderRadius: 12,
+    },
+    components: {
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            boxShadow: currentTheme === 'dark' ? '0 4px 20px rgba(0,0,0,0.5)' : '0 2px 8px rgba(0,0,0,0.1)',
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            textTransform: 'none',
+            borderRadius: 8,
+          },
+        },
+      },
+    },
+  }), [currentTheme]);
+
+  return (
+    <ThemeProvider theme={muiTheme}>
+      <CssBaseline />
+      {children}
+    </ThemeProvider>
+  );
+}
 
 function MainLayout() {
-
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
       <Navbar />
@@ -38,6 +97,9 @@ function MainLayout() {
           <Route path="/recommendations" element={<RecommendationIntelligence />} />
           <Route path="/reviews" element={<ReviewIntelligence />} />
           <Route path="/users" element={<UserExplorer />} />
+          <Route path="/data" element={<DataManagement />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Box>
@@ -48,7 +110,9 @@ function MainLayout() {
 function App() {
   return (
     <AppProvider>
-      <MainLayout />
+      <ThemeWrapper>
+        <MainLayout />
+      </ThemeWrapper>
     </AppProvider>
   );
 }

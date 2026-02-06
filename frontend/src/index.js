@@ -72,10 +72,7 @@ root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <App />
-        </ThemeProvider>
+        <App />
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>
