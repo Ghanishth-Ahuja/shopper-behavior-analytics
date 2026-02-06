@@ -29,16 +29,24 @@ const COLORS = [
 ];
 
 const SegmentDistributionChart = ({ data }) => {
-  // Default data if none provided
-  const defaultData = [
-    { name: 'Tech Enthusiasts', value: 3547, users: 3547 },
-    { name: 'Budget Shoppers', value: 2341, users: 2341 },
-    { name: 'Fashion Forward', value: 1876, users: 1876 },
-    { name: 'Home Decorators', value: 1234, users: 1234 },
-    { name: 'Practical Buyers', value: 987, users: 987 },
-  ];
+  // Transform API data into chart format
+  const chartData = React.useMemo(() => {
+    if (!data || data.length === 0) {
+      return [
+        { name: 'Tech Enthusiasts', value: 3547, users: 3547 },
+        { name: 'Budget Shoppers', value: 2341, users: 2341 },
+        { name: 'Fashion Forward', value: 1876, users: 1876 },
+        { name: 'Home Decorators', value: 1234, users: 1234 },
+        { name: 'Practical Buyers', value: 987, users: 987 },
+      ];
+    }
 
-  const chartData = data || defaultData;
+    return data.map(segment => ({
+      name: segment.segment_name || segment.id || 'Unnamed Segment',
+      value: segment.size || 0,
+      users: segment.size || 0,
+    }));
+  }, [data]);
 
   const RADIAN = Math.min(200, Math.min(200, 200 / chartData.length));
 
@@ -88,17 +96,20 @@ const SegmentDistributionChart = ({ data }) => {
           <Tooltip
             content={({ active, payload }) => {
               if (active && payload && payload.length) {
-                const data = payload[0].payload;
+                const item = payload[0].payload;
+                const totalUsers = (chartData || []).reduce((sum, item) => sum + (item.value || 0), 0);
+                const percentage = totalUsers > 0 ? (((item.value || 0) / totalUsers) * 100).toFixed(1) : '0';
+                
                 return (
-                  <Box sx={{ p: 1, bgcolor: 'background.paper', border: '1px solid #ccc' }}>
+                  <Box sx={{ p: 1, bgcolor: 'background.paper', border: '1px solid #ccc', boxShadow: 1 }}>
                     <Typography variant="subtitle2">
-                      {data.name}
+                      {item.name || 'Unknown Segment'}
                     </Typography>
                     <Typography variant="body2">
-                      Users: {data.users.toLocaleString()}
+                      Users: {(item.users || 0).toLocaleString()}
                     </Typography>
                     <Typography variant="body2">
-                      Percentage: {((data.value / chartData.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(1)}%
+                      Percentage: {percentage}%
                     </Typography>
                   </Box>
                 );

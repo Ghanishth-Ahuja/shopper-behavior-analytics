@@ -5,7 +5,7 @@ import os
 
 class Settings(BaseSettings):
     # MongoDB Settings
-    MONGODB_URL: str = "mongodb://localhost:27017"
+    MONGODB_URL: str = "mongodb+srv://tanishqjoshi200507:Tanishq2005@cluster0.tkmifn2.mongodb.net/"
     DATABASE_NAME: str = "shopper_analytics"
     
     # Redis Settings
@@ -31,8 +31,13 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = "INFO"
     
-    class Config:
-        env_file = ".env"
+    # Environment
+    ENVIRONMENT: str = "development"
+    
+    model_config = {
+        "env_file": ".env",
+        "extra": "ignore"
+    }
 
 
 settings = Settings()

@@ -428,6 +428,51 @@ class AnalyticsService:
             print(f"Error getting behavioral patterns: {e}")
             return {}
     
+    async def get_dashboard_metrics(self) -> Dict[str, Any]:
+        """Get overall dashboard KPI metrics"""
+        try:
+            # Get total customers
+            users_collection = self.db[Collections.USERS]
+            total_customers = await users_collection.count_documents({})
+            
+            # Get total revenue and conversion rate from transactions
+            transactions_collection = self.db[Collections.TRANSACTIONS]
+            
+            # Aggregate revenue
+            revenue_pipeline = [
+                {"$group": {"_id": None, "total_revenue": {"$sum": "$total_amount"}}}
+            ]
+            revenue_result = await transactions_collection.aggregate(revenue_pipeline).to_list(length=1)
+            total_revenue = revenue_result[0]["total_revenue"] if revenue_result else 0
+            
+            # Get conversion rate from sessions
+            funnel_data = await self.get_conversion_funnel()
+            conversion_rate = funnel_data.get("purchase_rate", 0)
+            
+            # Get revenue trends (placeholder for now)
+            revenue_trends = [
+                {"date": (datetime.utcnow() - timedelta(days=i)).strftime("%Y-%m-%d"), "revenue": total_revenue / 30 if total_revenue > 0 else 0}
+                for i in range(30, 0, -1)
+            ]
+            
+            return {
+                "totalCustomers": total_customers,
+                "conversionRate": round(conversion_rate, 2),
+                "totalRevenue": total_revenue,
+                "revenueTrends": revenue_trends,
+                "lastUpdated": datetime.utcnow()
+            }
+            
+        except Exception as e:
+            print(f"Error getting dashboard metrics: {e}")
+            return {
+                "totalCustomers": 0,
+                "conversionRate": 0,
+                "totalRevenue": 0,
+                "revenueTrends": [],
+                "error": str(e)
+            }
+
     async def get_segment_dashboard(self, segment_id: str) -> Dict[str, Any]:
         """Get comprehensive dashboard data for a segment"""
         try:

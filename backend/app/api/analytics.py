@@ -140,6 +140,16 @@ async def get_behavioral_patterns():
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@router.get("/dashboard")
+async def get_dashboard_metrics():
+    """Get overall dashboard KPI metrics"""
+    try:
+        analytics_service = AnalyticsService()
+        return await analytics_service.get_dashboard_metrics()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @router.get("/dashboard/{segment_id}")
 async def get_segment_dashboard(segment_id: str):
     """Get comprehensive dashboard data for a segment"""

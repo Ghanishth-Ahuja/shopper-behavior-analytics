@@ -17,29 +17,42 @@ import {
 } from 'recharts';
 
 const CategoryHeatmap = ({ data }) => {
-  // Default data if none provided
-  const defaultData = [
-    { category: 'Electronics', segments: ['Tech Enthusiasts', 'Budget Shoppers'], values: [85, 45] },
-    { category: 'Clothing', segments: ['Fashion Forward', 'Value Seekers'], values: [72, 68] },
-    { category: 'Home', segments: ['Home Decorators', 'Practical Buyers'], values: [58, 82] },
-    { category: 'Books', segments: ['Tech Enthusiasts', 'Value Seekers'], values: [91, 23] },
-    { category: 'Sports', segments: ['Active Lifestyle', 'Weekend Warriors'], values: [67, 34] },
-  ];
+  // Transform API data for heatmap
+  const heatmapData = React.useMemo(() => {
+    if (!data || data.length === 0) {
+      const defaultData = [
+        { category: 'Electronics', segments: ['Tech Enthusiasts', 'Budget Shoppers'], values: [85, 45] },
+        { category: 'Clothing', segments: ['Fashion Forward', 'Value Seekers'], values: [72, 68] },
+        { category: 'Home', segments: ['Home Decorators', 'Practical Buyers'], values: [58, 82] },
+        { category: 'Books', segments: ['Tech Enthusiasts', 'Value Seekers'], values: [91, 23] },
+        { category: 'Sports', segments: ['Active Lifestyle', 'Weekend Warriors'], values: [67, 34] },
+      ];
+      
+      const flat = [];
+      defaultData.forEach((item) => {
+        item.segments.forEach((segment, index) => {
+          flat.push({
+            category: item.category,
+            segment: segment,
+            value: item.values[index],
+          });
+        });
+      });
+      return flat;
+    }
 
-  const chartData = data || defaultData;
-
-  // Transform data for heatmap
-  const heatmapData = [];
-  chartData.forEach((item) => {
-    item.segments.forEach((segment, index) => {
-      heatmapData.push({
-        category: item.category,
-        segment: segment,
-        value: item.values[index],
-        fill: item.values[index],
+    const flat = [];
+    data.forEach((segment) => {
+      Object.entries(segment.category_affinities || {}).forEach(([category, score]) => {
+        flat.push({
+          category,
+          segment: segment.segment_name,
+          value: Math.round(score * 100), // Scale to 0-100 for color scale
+        });
       });
     });
-  });
+    return flat;
+  }, [data]);
 
   // Color scale
   const getColor = (value) => {
