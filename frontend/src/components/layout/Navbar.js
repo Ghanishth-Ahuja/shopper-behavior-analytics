@@ -22,10 +22,12 @@ import {
   Refresh,
 } from '@mui/icons-material';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { sidebarOpen, toggleSidebar, theme, setTheme } = useApp();
+  const { user, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
 
@@ -114,8 +116,8 @@ const Navbar = () => {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
-                <AccountCircle />
+              <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main', fontSize: '0.9rem' }}>
+                {user?.full_name?.split(' ').map(n => n[0]).join('') || <AccountCircle />}
               </Avatar>
             </IconButton>
           </Tooltip>
@@ -139,6 +141,11 @@ const Navbar = () => {
               sx: { mt: 2, minWidth: 200 },
             }}
           >
+            <Box sx={{ px: 2, py: 1.5 }}>
+              <Typography variant="subtitle2" noWrap>{user?.full_name}</Typography>
+              <Typography variant="body2" color="text.secondary" noWrap>{user?.email}</Typography>
+            </Box>
+            <Divider />
             <MenuItem onClick={() => { handleProfileMenuClose(); navigate('/profile'); }}>
               <Avatar sx={{ width: 24, height: 24, mr: 2 }} />
               Profile
@@ -155,7 +162,7 @@ const Navbar = () => {
               </Box>
             </MenuItem>
             <Divider />
-            <MenuItem onClick={handleProfileMenuClose}>
+            <MenuItem onClick={() => { handleProfileMenuClose(); logout(); }}>
               <Logout sx={{ mr: 2 }} color="error" />
               <Typography color="error">Logout</Typography>
             </MenuItem>

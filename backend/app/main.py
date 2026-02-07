@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.config.settings import settings
 from app.database.mongodb import MongoDB
-from app.api import users, products, sessions, transactions, reviews, segmentation, recommendations, analytics, events
+from app.api import users, products, sessions, transactions, reviews, segmentation, recommendations, analytics, events, auth
 import uvicorn
 
 
@@ -33,6 +33,7 @@ app.add_middleware(
 )
 
 # Include API routers
+app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(users.router, prefix=f"{settings.API_V1_STR}/users", tags=["users"])
 app.include_router(products.router, prefix=f"{settings.API_V1_STR}/products", tags=["products"])
 app.include_router(sessions.router, prefix=f"{settings.API_V1_STR}/sessions", tags=["sessions"])

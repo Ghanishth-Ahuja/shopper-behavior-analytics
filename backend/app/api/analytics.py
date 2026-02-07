@@ -158,3 +158,12 @@ async def get_segment_dashboard(segment_id: str):
         return await analytics_service.get_segment_dashboard(segment_id)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/bulk-upload/{type}")
+async def bulk_upload(type: str, data: List[Dict[str, Any]]):
+    """Bulk upload data for analysis"""
+    try:
+        analytics_service = AnalyticsService()
+        return await analytics_service.bulk_upload(type, data)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

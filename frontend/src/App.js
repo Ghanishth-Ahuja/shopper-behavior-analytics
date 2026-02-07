@@ -13,9 +13,19 @@ import UserExplorer from './pages/UserExplorer';
 import DataManagement from './pages/DataManagement';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import { AppProvider, useApp } from './context/AppContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import LoadingSpinner from './components/common/LoadingSpinner';
+
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) return <LoadingSpinner fullScreen message="Checking authorization..." />;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 
 function ThemeWrapper({ children }) {
   const { theme: currentTheme } = useApp();
@@ -72,48 +82,56 @@ function ThemeWrapper({ children }) {
   );
 }
 
-function MainLayout() {
+function AuthenticatedApp() {
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
-      <Navbar />
-      <Sidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          mt: 8, // navbar height
-          overflowX: 'hidden',
-          minHeight: 'calc(100vh - 64px)',
-          display: 'block'
-        }}
-      >
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/segments" element={<SegmentExplorer />} />
-          <Route path="/segments/:segmentId" element={<SegmentDetail />} />
-          <Route path="/affinity" element={<ProductAffinity />} />
-          <Route path="/recommendations" element={<RecommendationIntelligence />} />
-          <Route path="/reviews" element={<ReviewIntelligence />} />
-          <Route path="/users" element={<UserExplorer />} />
-          <Route path="/data" element={<DataManagement />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
+    <ProtectedRoute>
+      <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Navbar />
+        <Sidebar />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            mt: 8, // navbar height
+            overflowX: 'hidden',
+            minHeight: 'calc(100vh - 64px)',
+            display: 'block'
+          }}
+        >
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/segments" element={<SegmentExplorer />} />
+            <Route path="/segments/:segmentId" element={<SegmentDetail />} />
+            <Route path="/affinity" element={<ProductAffinity />} />
+            <Route path="/recommendations" element={<RecommendationIntelligence />} />
+            <Route path="/reviews" element={<ReviewIntelligence />} />
+            <Route path="/users" element={<UserExplorer />} />
+            <Route path="/data" element={<DataManagement />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </Box>
       </Box>
-    </Box>
+    </ProtectedRoute>
   );
 }
 
 function App() {
   return (
-    <AppProvider>
-      <ThemeWrapper>
-        <MainLayout />
-      </ThemeWrapper>
-    </AppProvider>
+    <AuthProvider>
+      <AppProvider>
+        <ThemeWrapper>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/*" element={<AuthenticatedApp />} />
+          </Routes>
+        </ThemeWrapper>
+      </AppProvider>
+    </AuthProvider>
   );
 }
 

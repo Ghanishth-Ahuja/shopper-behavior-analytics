@@ -886,14 +886,45 @@ class AnalyticsService:
     
     async def _get_recent_segment_activity(self, segment_id: str) -> List[Dict]:
         """Get recent activity for a segment"""
+        # ... (rest of the method logic)
+        return [{"type": "purchase", "count": 25, "date": "2024-01-15"}]
+
+    async def bulk_upload(self, type: str, data: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Bulk upload data for analysis"""
         try:
-            # This would get recent events, purchases
-            # For now, return placeholder
-            return [
-                {"type": "purchase", "count": 25, "date": "2024-01-15"},
-                {"type": "session", "count": 100, "date": "2024-01-15"}
-            ]
+            collection_map = {
+                "products": Collections.PRODUCTS,
+                "users": Collections.USERS,
+                "transactions": Collections.TRANSACTIONS,
+                "reviews": Collections.REVIEWS
+            }
+            
+            if type not in collection_map:
+                raise ValueError(f"Invalid upload type: {type}")
+            
+            collection = self.db[collection_map[type]]
+            
+            if not data:
+                return {"message": "No data provided", "count": 0}
+            
+            # Prepare data (handle timestamps if necessary)
+            for item in data:
+                if "created_at" in item and isinstance(item["created_at"], str):
+                    item["created_at"] = datetime.fromisoformat(item["created_at"].replace("Z", "+00:00"))
+                elif "created_at" not in item:
+                    item["created_at"] = datetime.utcnow()
+                
+                if "updated_at" not in item:
+                    item["updated_at"] = datetime.utcnow()
+
+            result = await collection.insert_many(data)
+            
+            return {
+                "message": f"Successfully uploaded {len(result.inserted_ids)} {type}",
+                "count": len(result.inserted_ids),
+                "type": type
+            }
             
         except Exception as e:
-            print(f"Error getting recent segment activity: {e}")
-            return []
+            print(f"Error in bulk upload: {e}")
+            raise e

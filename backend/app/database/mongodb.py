@@ -13,6 +13,9 @@ class MongoDB:
         cls.client = AsyncIOMotorClient(settings.MONGODB_URL)
         cls.database = cls.client[settings.DATABASE_NAME]
         print(f"Connected to MongoDB: {settings.DATABASE_NAME}")
+        
+        # Create indexes
+        await cls.database[Collections.DASHBOARD_USERS].create_index("email", unique=True)
 
     @classmethod
     async def close_mongo_connection(cls):
@@ -42,3 +45,4 @@ class Collections:
     SEGMENTS = "segments"
     USER_FEATURES = "user_features"
     EVENTS = "events"
+    DASHBOARD_USERS = "dashboard_users"

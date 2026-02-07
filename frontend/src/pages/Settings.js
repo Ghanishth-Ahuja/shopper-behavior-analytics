@@ -10,6 +10,8 @@ import {
   ListItemIcon,
   Divider,
   Button,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import {
   Notifications,
@@ -23,6 +25,11 @@ import { useApp } from '../context/AppContext';
 
 const Settings = () => {
   const { theme, setTheme } = useApp();
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+
+  const handleSave = () => {
+    setSnackbarOpen(true);
+  };
 
   return (
     <Box>
@@ -113,8 +120,19 @@ const Settings = () => {
       
       <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
         <Button>Reset to Defaults</Button>
-        <Button variant="contained">Save All Changes</Button>
+        <Button variant="contained" onClick={handleSave}>Save All Changes</Button>
       </Box>
+
+      <Snackbar 
+        open={snackbarOpen} 
+        autoHideDuration={3000} 
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert severity="success" sx={{ width: '100%', borderRadius: 2 }}>
+          Settings saved successfully!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

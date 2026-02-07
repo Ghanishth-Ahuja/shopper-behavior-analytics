@@ -18,7 +18,15 @@ import {
   AdminPanelSettings,
 } from '@mui/icons-material';
 
+import { useAuth } from '../context/AuthContext';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+
 const Profile = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) return <LoadingSpinner message="Loading profile..." />;
+  if (!user) return <Typography>Please login to see your profile.</Typography>;
+
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
@@ -31,17 +39,17 @@ const Profile = () => {
             <Avatar 
               sx={{ width: 120, height: 120, mx: 'auto', mb: 2, bgcolor: 'primary.main', fontSize: 40 }}
             >
-              JD
+              {user.full_name?.split(' ').map(n => n[0]).join('')}
             </Avatar>
-            <Typography variant="h5" gutterBottom>John Doe</Typography>
-            <Typography variant="body2" color="text.secondary" gutterBottom>Senior Merchandising Manager</Typography>
-            <Chip label="Administrator" color="primary" size="small" icon={<AdminPanelSettings />} sx={{ mt: 1 }} />
+            <Typography variant="h5" gutterBottom>{user.full_name}</Typography>
+            <Typography variant="body2" color="text.secondary" gutterBottom>{user.role.toUpperCase()}</Typography>
+            <Chip label={user.role} color="primary" size="small" icon={<AdminPanelSettings />} sx={{ mt: 1 }} />
             
             <Divider sx={{ my: 3 }} />
             
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
               <Email fontSize="small" color="action" />
-              <Typography variant="body2">john.doe@shoppers-intel.com</Typography>
+              <Typography variant="body2">{user.email}</Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
               <Phone fontSize="small" color="action" />
@@ -63,16 +71,16 @@ const Profile = () => {
             <Typography variant="h6" gutterBottom>Account Details</Typography>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="First Name" defaultValue="John" />
+                <TextField fullWidth label="First Name" defaultValue={user.full_name?.split(' ')[0]} />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="Last Name" defaultValue="Doe" />
+                <TextField fullWidth label="Last Name" defaultValue={user.full_name?.split(' ').slice(1).join(' ')} />
               </Grid>
               <Grid item xs={12}>
-                <TextField fullWidth label="Email Address" defaultValue="john.doe@shoppers-intel.com" />
+                <TextField fullWidth label="Email Address" defaultValue={user.email} />
               </Grid>
               <Grid item xs={12}>
-                <TextField fullWidth label="Company" defaultValue="Shopper Intelligence Dashboard" />
+                <TextField fullWidth label="Role" defaultValue={user.role} InputProps={{ readOnly: true }} />
               </Grid>
               <Grid item xs={12}>
                 <Divider sx={{ my: 2 }} />

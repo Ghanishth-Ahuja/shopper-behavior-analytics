@@ -13,7 +13,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Add auth token if available
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,7 +28,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('token');
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -68,6 +68,13 @@ export const analyticsApi = {
   // Events
   getEventAnalytics: (params = {}) => api.get('/analytics/events', { params }).then(res => res.data),
   getEventHeatmap: (params = {}) => api.get('/analytics/heatmap', { params }).then(res => res.data),
+
+  // Data Ingestion
+  createProduct: (data) => api.post('/products', data).then(res => res.data),
+  createUser: (data) => api.post('/users', data).then(res => res.data),
+  createTransaction: (data) => api.post('/transactions', data).then(res => res.data),
+  createReview: (data) => api.post('/reviews', data).then(res => res.data),
+  bulkUpload: (type, data) => api.post(`/analytics/bulk-upload/${type}`, data).then(res => res.data),
 };
 
 export default api;

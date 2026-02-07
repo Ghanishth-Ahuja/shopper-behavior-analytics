@@ -50,27 +50,53 @@ const DataManagement = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // In a real app, we would have a dedicated API for this
-      // For now, let's pretend we're sending it
-      console.log('Submitting product:', productData);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await analyticsApi.createProduct({
+        ...productData,
+        price: parseFloat(productData.price)
+      });
       setSnackbar({ open: true, message: 'Product added successfully!', severity: 'success' });
       setProductData({ product_id: '', category: '', brand: '', price: '' });
     } catch (error) {
-      setSnackbar({ open: true, message: 'Error adding product.', severity: 'error' });
+      setSnackbar({ open: true, message: error.response?.data?.detail || 'Error adding product.', severity: 'error' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFileUpload = async (type) => {
+  const processCSV = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const rows = text.split('\n').filter(r => r.trim());
+        const headers = rows[0].split(',').map(h => h.trim());
+        const data = rows.slice(1).map(row => {
+          const values = row.split(',').map(v => v.trim());
+          return headers.reduce((obj, header, i) => {
+            obj[header] = values[i];
+            return obj;
+          }, {});
+        });
+        resolve(data);
+      };
+      reader.readAsText(file);
+    });
+  };
+
+  const handleFileUpload = async (type, file) => {
+    if (!file) return;
     setLoading(true);
     try {
-      // Simulate CSV processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setSnackbar({ open: true, message: `${type} CSV processed successfully!`, severity: 'success' });
+      const data = await processCSV(file);
+      const endpointType = type.toLowerCase().includes('catalog') ? 'products' : 
+                          type.toLowerCase().includes('user') ? 'users' :
+                          type.toLowerCase().includes('transaction') ? 'transactions' : 'reviews';
+      
+      const response = await analyticsApi.bulkUpload(endpointType, data);
+      setSnackbar({ open: true, message: response.message, severity: 'success' });
     } catch (error) {
-      setSnackbar({ open: true, message: 'Error processing file.', severity: 'error' });
+      console.error('Upload error:', error);
+      setSnackbar({ open: true, message: error.response?.data?.detail || 'Error processing file.', severity: 'error' });
     } finally {
       setLoading(false);
     }
@@ -112,15 +138,26 @@ const DataManagement = () => {
                     <ListItem
                       key={item.name}
                       secondaryAction={
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          startIcon={<CloudUpload />}
-                          onClick={() => handleFileUpload(item.type)}
-                          disabled={loading}
-                        >
-                          Upload
-                        </Button>
+                        <Box>
+                          <input
+                            type="file"
+                            accept=".csv"
+                            style={{ display: 'none' }}
+                            id={`file-upload-${item.type}`}
+                            onChange={(e) => handleFileUpload(item.type, e.target.files[0])}
+                          />
+                          <label htmlFor={`file-upload-${item.type}`}>
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              startIcon={<CloudUpload />}
+                              component="span"
+                              disabled={loading}
+                            >
+                              Upload
+                            </Button>
+                          </label>
+                        </Box>
                       }
                       sx={{ border: '1px solid #eee', mb: 1, borderRadius: 2 }}
                     >
